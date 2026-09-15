@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوصلة القيادة — AFAQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-bg: #16241C;
+    --ink-bg-2: #1E3327;
+    --paper: #F4EFE1;
+    --paper-dim: #E9E2CC;
+    --ink: #22301F;
+    --ink-soft: #5B6154;
+    --gold: #C0932E;
+    --gold-deep: #93701E;
+    --stamp-done: #2F5233;
+    --alert: #A6503B;
+    --line: #D8CFB2;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, #24402F 0%, transparent 60%),
+      var(--ink-bg);
+    color:var(--paper);
+    min-height:100vh;
+    padding:28px 16px 80px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+
+  header{margin-bottom:22px;}
+  .eyebrow{color:var(--gold);font-weight:700;font-size:13px;letter-spacing:.3px;margin-bottom:4px;}
+  h1{margin:0 0 4px;font-size:30px;font-weight:800;color:var(--paper);}
+  .sub{color:#B9C4B4;font-size:14.5px;line-height:1.6;margin:0;}
+  .livecount{
+    display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+    background:rgba(192,147,46,.13);border:1px solid rgba(192,147,46,.4);
+    color:var(--gold);padding:7px 14px;border-radius:99px;font-size:13.5px;font-weight:700;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);}
+
+  .teamstrip{
+    display:flex;gap:8px;overflow-x:auto;padding:16px 2px 20px;margin-bottom:4px;
+    scrollbar-width:thin;
+  }
+  .chip{
+    flex:0 0 auto;width:44px;height:44px;border-radius:10px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);
+    color:#C9D2C4;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:15px;cursor:pointer;transition:.15s;
+  }
+  .chip:hover{border-color:var(--gold);color:var(--gold);}
+  .chip.active{background:var(--gold);border-color:var(--gold);color:#1B1404;}
+  .chip.hasdata::after{content:'';}
+
+  .panel{
+    background:var(--paper);color:var(--ink);border-radius:16px;
+    padding:20px 20px 8px;box-shadow:0 20px 40px rgba(0,0,0,.25);
+  }
+  .panel-empty{
+    background:transparent;border:1.5px dashed rgba(244,239,225,.25);
+    color:#B9C4B4;text-align:center;padding:40px 20px;border-radius:16px;font-size:14.5px;line-height:1.8;
+  }
+  .teamhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:16px;}
+  .teamname-row{display:flex;align-items:center;gap:10px;flex:1;min-width:200px;}
+  .teamnum{
+    width:34px;height:34px;border-radius:8px;background:var(--stamp-done);color:var(--paper);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex:0 0 auto;
+  }
+  .teamname-row input{
+    border:none;background:transparent;font-size:18px;font-weight:800;color:var(--ink);
+    font-family:inherit;width:100%;padding:4px 2px;border-bottom:1px dashed transparent;
+  }
+  .teamname-row input:focus{outline:none;border-bottom:1px dashed var(--gold-deep);}
+  .progress-badge{
+    background:var(--ink);color:var(--paper);font-weight:800;font-size:13.5px;
+    padding:7px 12px;border-radius:99px;flex:0 0 auto;
+  }
+
+  .task{
+    border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;
+    background:linear-gradient(180deg, #FBF8EE, var(--paper));transition:.15s;
+    border-inline-start:4px solid transparent;
+  }
+  .task.lvl-25{border-inline-start-color:#C79A2B;}
+  .task.lvl-50{border-inline-start-color:#8C8A2E;}
+  .task.lvl-100{border-inline-start-color:var(--stamp-done);background:linear-gradient(180deg,#EEF3E8,#E7EEE0);}
+  .task-top{display:flex;gap:12px;align-items:flex-start;}
+  .task-body{flex:1;min-width:0;}
+  .levels{display:flex;gap:6px;margin:10px 0 12px;flex-wrap:wrap;}
+  .lvl-btn{
+    flex:0 0 auto;border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);
+    font-family:inherit;font-weight:700;font-size:12.5px;padding:7px 12px;border-radius:8px;cursor:pointer;transition:.15s;
+  }
+  .lvl-btn:hover{border-color:var(--gold-deep);}
+  .lvl-btn.sel-0.active{background:var(--ink-soft);border-color:var(--ink-soft);color:#fff;}
+  .lvl-btn.sel-25.active{background:#C79A2B;border-color:#C79A2B;color:#241A02;}
+  .lvl-btn.sel-50.active{background:#8C8A2E;border-color:#8C8A2E;color:#fff;}
+  .lvl-btn.sel-100.active{background:var(--stamp-done);border-color:var(--stamp-done);color:#fff;}
+  .task-title-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+  .task-title{font-weight:800;font-size:15.5px;}
+  .task-en{color:var(--ink-soft);font-size:12px;font-style:italic;}
+  .tag{
+    font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;flex:0 0 auto;
+  }
+  .tag.ind{background:#E3E9D8;color:#3F5A2E;}
+  .tag.team{background:#EADFC7;color:var(--gold-deep);}
+  .task-desc{color:var(--ink-soft);font-size:13.5px;line-height:1.7;margin:5px 0 10px;}
+  .task-note{
+    width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+    font-family:inherit;font-size:13px;background:#fff;color:var(--ink);
+  }
+  .task-note::placeholder{color:#B0A98D;}
+
+  .footbar{
+    position:fixed;bottom:18px;right:50%;transform:translateX(50%);
+    background:var(--gold);color:#1B1404;border:none;padding:12px 22px;border-radius:99px;
+    font-family:inherit;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 10px 24px rgba(0,0,0,.35);
+    display:flex;align-items:center;gap:8px;
+  }
+
+  .dash-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .dash-row:last-child{border-bottom:none;}
+  .dash-num{width:26px;height:26px;border-radius:6px;background:var(--ink);color:var(--paper);font-weight:800;font-size:12.5px;display:flex;align-items:center;justify-content:center;}
+  .dash-name{flex:1;font-weight:700;}
+  .bar{flex:1;max-width:140px;height:8px;background:var(--paper-dim);border-radius:99px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--stamp-done);}
+  .dash-count{font-weight:800;font-size:12.5px;color:var(--ink-soft);width:38px;text-align:left;}
+  .status{font-size:12px;color:#B9C4B4;text-align:center;margin-top:10px;min-height:16px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">AFAQ - اليوم الأول - تحدي القيادة من تكنو-شباب</div>
+    <h1>بوصلة القيادة</h1>
+    <p class="sub">عشر محطات لرصد وتعزيز مهارة القيادة لدى الأفراد والفرق، مدمجة داخل فعاليات بداية اليوم — دون وقت إضافي.</p>
+    <div class="livecount"><span class="dot"></span><span id="liveCountText">جاري التحميل…</span></div>
+  </header>
+
+  <div class="teamstrip" id="teamStrip"></div>
+
+  <div id="mainArea"><div class="panel-empty">اختر رقم فريق من الأعلى للبدء بتسجيل الملاحظات</div></div>
+
+  <div class="status" id="statusMsg"></div>
+</div>
+
+<button class="footbar" id="dashToggle">لوحة المتابعة الحية</button>
+
+<script>
+const TASKS = [
+  {id:1, title:"بصمة القيادة", en:"Leadership Fingerprint", tag:"ind", desc:"كل مشارك يكتب كلمة واحدة تصف أسلوبه في القيادة على صفحة جواز آفاق، قبل اختيار الشخصية."},
+  {id:2, title:"تعريف الدقيقة", en:"60-Second Intro", tag:"ind", desc:"كل مشارك يقدّم نفسه لزميل بجانبه خلال 60 ثانية، والزميل يرصد سلوكًا قياديًا واحدًا لاحظه."},
+  {id:3, title:"الاصطفاف الصامت", en:"Silent Line-Up", tag:"team", desc:"قبل تثبيت الفريق، يصطف الأعضاء حسب معيار متفق عليه دون كلام — لرصد من يبرز كمنظّم طبيعي."},
+  {id:4, title:"قيادة اللغز", en:"Puzzle Command", tag:"team", desc:"أثناء Green Puzzle Mission، يرصد الميسّر من يتولى تلقائيًا دور التنسيق أو التوقيت أو التواصل."},
+  {id:5, title:"تفويض المهمة", en:"Delegate in 2 Minutes", tag:"team", desc:"قائد مؤقت (يتم تدويره) يوزّع 3 مهام فرعية على زملائه خلال دقيقتين فقط."},
+  {id:6, title:"قرار الستين ثانية", en:"60-Second Decision", tag:"team", desc:"يُطرح تحدٍ بسيط على الفريق، ويجب أن يخرجوا بقرار جماعي خلال دقيقة — مع رصد من قاد النقاش."},
+  {id:7, title:"مرآة القيادة", en:"Leadership Mirror", tag:"ind", desc:"كل عضو يخبر زميلاً واحدًا بصفة قيادية لاحظها فيه، بشكل مباشر وسريع."},
+  {id:8, title:"زاوية الخلاف", en:"Conflict Corner", tag:"team", desc:"تمثيل سريع لخلاف بسيط داخل زاوية التفاوض (Negotiation Corner)، ورصد أسلوب الحل المستخدم."},
+  {id:9, title:"الاستماع الفعّال", en:"Active Listening Check", tag:"ind", desc:"تمرين إعادة صياغة بالأزواج: يعيد كل مشارك ما قاله زميله بكلماته الخاصة."},
+  {id:10, title:"التزام القيادة", en:"Leadership Commitment Card", tag:"team", desc:"يكتب الفريق سلوكًا قياديًا واحدًا سيطبقونه في تحدي اليوم الثاني، ويُسجَّل في جواز آفاق."},
+];
+const TEAM_COUNT = 24;
+let currentTeam = null;
+let teamsCache = {}; // id -> record
+let dashboardOpen = false;
+
+const LEVELS = [0, 25, 50, 100];
+const LEVEL_LABELS = {0:"لم تُنجز", 25:"25%", 50:"50%", 100:"100%"};
+
+function emptyRecord(id){
+  const tasks = {};
+  TASKS.forEach(t => tasks[t.id] = {level:0, note:""});
+  return {id, name:"فريق " + id, tasks};
+}
+
+async function loadTeam(id){
+  try{
+    const res = await window.storage.get('team:' + id, true);
+    return res ? JSON.parse(res.value) : emptyRecord(id);
+  }catch(e){
+    return emptyRecord(id);
+  }
+}
+
+async function saveTeam(record){
+  try{
+    await window.storage.set('team:' + record.id, JSON.stringify(record), true);
+    setStatus('تم الحفظ');
+  }catch(e){
+    setStatus('تعذّر الحفظ — حاول مجددًا');
+  }
+}
+
+function setStatus(msg){
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  clearTimeout(setStatus._t);
+  setStatus._t = setTimeout(()=>{ el.textContent = ''; }, 1600);
+}
+
+function buildTeamStrip(){
+  const strip = document.getElementById('teamStrip');
+  strip.innerHTML = '';
+  for(let i=1;i<=TEAM_COUNT;i++){
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = i;
+    chip.dataset.id = i;
+    chip.addEventListener('click', () => selectTeam(i));
+    strip.appendChild(chip);
+  }
+}
+
+async function selectTeam(id){
+  currentTeam = id;
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', Number(c.dataset.id) === id));
+  const area = document.getElementById('mainArea');
+  area.innerHTML = '<div class="panel-empty">جاري تحميل بيانات الفريق…</div>';
+  const record = teamsCache[id] || await loadTeam(id);
+  teamsCache[id] = record;
+  renderPanel(record);
+}
+
+// نقاط القيادة: متوسط مستويات الإنجاز عبر المهام العشر (0-100)
+function scoreOf(record){
+  const sum = TASKS.reduce((acc,t) => acc + ((record.tasks[t.id] && record.tasks[t.id].level) || 0), 0);
+  return Math.round(sum / TASKS.length);
+}
+function touchedCount(record){
+  return TASKS.filter(t => record.tasks[t.id] && record.tasks[t.id].level > 0).length;
+}
+
+function renderPanel(record){
+  const area = document.getElementById('mainArea');
+  const score = scoreOf(record);
+  area.innerHTML = `
+    <div class="panel">
+      <div class="teamhead">
+        <div class="teamname-row">
+          <div class="teamnum">${record.id}</div>
+          <input type="text" id="teamNameInput" value="${escapeAttr(record.name)}" placeholder="اسم الفريق">
+        </div>
+        <div class="progress-badge">${score}% نقاط القيادة</div>
+      </div>
+      <div id="taskList"></div>
+    </div>
+  `;
+  document.getElementById('teamNameInput').addEventListener('change', (e) => {
+    record.name = e.target.value.trim() || ('فريق ' + record.id);
+    saveTeam(record);
+  });
+
+  const list = document.getElementById('taskList');
+  TASKS.forEach(t => {
+    const state = record.tasks[t.id] || {level:0, note:""};
+    const card = document.createElement('div');
+    card.className = 'task' + (state.level > 0 ? ' lvl-' + state.level : '');
+    const levelBtns = LEVELS.map(l =>
+      `<button class="lvl-btn sel-${l}${state.level === l ? ' active' : ''}" data-level="${l}">${LEVEL_LABELS[l]}</button>`
+    ).join('');
+    card.innerHTML = `
+      <div class="task-top">
+        <div class="task-body">
+          <div class="task-title-row">
+            <span class="task-title">${t.id}. ${t.title}</span>
+            <span class="task-en">${t.en}</span>
+            <span class="tag ${t.tag}">${t.tag === 'ind' ? 'فردي' : 'جماعي'}</span>
+          </div>
+          <p class="task-desc">${t.desc}</p>
+          <div class="levels">${levelBtns}</div>
+          <input type="text" class="task-note" placeholder="من أظهر السلوك؟ ملاحظة سريعة…" value="${escapeAttr(state.note)}">
+        </div>
+      </div>
+    `;
+    card.querySelectorAll('.lvl-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const level = Number(btn.dataset.level);
+        state.level = level;
+        record.tasks[t.id] = state;
+        card.className = 'task' + (level > 0 ? ' lvl-' + level : '');
+        card.querySelectorAll('.lvl-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.level) === level));
+        area.querySelector('.progress-badge').textContent = scoreOf(record) + '% نقاط القيادة';
+        saveTeam(record);
+        refreshChipData();
+      });
+    });
+    const note = card.querySelector('.task-note');
+    note.addEventListener('change', () => {
+      state.note = note.value;
+      record.tasks[t.id] = state;
+      saveTeam(record);
+    });
+    list.appendChild(card);
+  });
+}
+
+function escapeAttr(s){
+  return String(s||'').replace(/"/g,'&quot;');
+}
+
+async function refreshChipData(){
+  document.querySelectorAll('.chip').forEach(chip => {
+    const id = Number(chip.dataset.id);
+    const rec = teamsCache[id];
+    chip.classList.toggle('hasdata', !!(rec && touchedCount(rec) > 0));
+    chip.style.color = (rec && scoreOf(rec) === 100) ? 'var(--gold)' : '';
+  });
+  updateLiveCount();
+}
+
+async function updateLiveCount(){
+  let started = Object.keys(teamsCache).filter(id => touchedCount(teamsCache[id]) > 0).length;
+  document.getElementById('liveCountText').textContent = `${started} من ${TEAM_COUNT} فريقًا بدأ الرصد`;
+}
+
+async function preloadAll(){
+  try{
+    const listRes = await window.storage.list('team:', true);
+    const keys = (listRes && listRes.keys) ? listRes.keys : [];
+    await Promise.all(keys.map(async k => {
+      const id = Number(k.split(':')[1]);
+      const rec = await loadTeam(id);
+      teamsCache[id] = rec;
+    }));
+  }catch(e){ /* no data yet */ }
+  refreshChipData();
+}
+
+function renderDashboard(){
+  const area = document.getElementById('mainArea');
+  const rows = [];
+  for(let i=1;i<=TEAM_COUNT;i++){
+    const rec = teamsCache[i] || emptyRecord(i);
+    rows.push(rec);
+  }
+  rows.sort((a,b) => scoreOf(b) - scoreOf(a) || a.id - b.id);
+  const topScore = rows.length ? scoreOf(rows[0]) : 0;
+  area.innerHTML = `<div class="panel"><div style="padding:4px 0 14px;font-weight:800;font-size:16px;">لوحة متابعة القيادة — 24 فريقًا</div><div id="dashList"></div></div>`;
+  const dl = document.getElementById('dashList');
+  rows.forEach((rec, idx) => {
+    const s = scoreOf(rec);
+    const gap = topScore - s;
+    const row = document.createElement('div');
+    row.className = 'dash-row';
+    row.innerHTML = `
+      <div class="dash-num">#${idx+1}</div>
+      <div class="dash-name">${escapeAttr(rec.name)}</div>
+      <div class="bar"><div class="bar-fill" style="width:${s}%"></div></div>
+      <div class="dash-count">${s}%</div>
+      <div class="dash-count" style="color:${gap===0 ? 'var(--stamp-done)' : 'var(--alert)'};">${gap===0 ? 'الأول' : '−' + gap}</div>
+    `;
+    dl.appendChild(row);
+  });
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+}
+
+document.getElementById('dashToggle').addEventListener('click', async () => {
+  dashboardOpen = !dashboardOpen;
+  document.getElementById('dashToggle').textContent = dashboardOpen ? 'العودة لتسجيل فريق' : 'لوحة المتابعة الحية';
+  if(dashboardOpen){
+    await preloadAll();
+    renderDashboard();
+  } else if(currentTeam){
+    selectTeam(currentTeam);
+  } else {
+    document.getElementById('mainArea').innerHTML = '<div class="panel-empty">اختر رقم فريق من الأعلى للبدء بتسجيل الملاحظات</div>';
+  }
+});
+
+buildTeamStrip();
+preloadAll();
+</script>
+</body>
+</html>
